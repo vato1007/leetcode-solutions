@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int countBinarySubstrings(string s) {
+        int answer = 0;
+        int previousGroup = 0, currentGroup = 1;
+
+        for (int i = 1; i < s.size(); ++i) {
+            if (s[i] == s[i - 1]) {
+                currentGroup++;
+            } else {
+                answer += min(previousGroup, currentGroup);
+                previousGroup = currentGroup;
+                currentGroup = 1;
+            }
+        }
+
+        return answer + min(previousGroup, currentGroup);
+    }
+};
