@@ -1,0 +1,77 @@
+#include <vector>
+
+using namespace std;
+
+class Fancy {
+    static const long long MOD = 1000000007;
+    static const int MAXN = 100000 + 5;
+
+    vector<long long> lazyMul, lazyAdd, values;
+    int n;
+
+    void apply(int node, long long mul, long long add) {
+        lazyMul[node] = lazyMul[node] * mul % MOD;
+        lazyAdd[node] = (lazyAdd[node] * mul + add) % MOD;
+    }
+
+    void update(int node, int left, int right,
+                int ql, int qr, long long mul, long long add) {
+        if (qr < left || right < ql) return;
+
+        if (ql <= left && right <= qr) {
+            apply(node, mul, add);
+            return;
+        }
+
+        int mid = left + (right - left) / 2;
+        update(node * 2, left, mid, ql, qr, mul, add);
+        update(node * 2 + 1, mid + 1, right, ql, qr, mul, add);
+    }
+
+    long long query(int node, int left, int right, int index,
+                    long long afterMul = 1, long long afterAdd = 0) {
+        // Apply this node's pending transformation before later ancestor ones.
+        afterAdd = (afterMul * lazyAdd[node] + afterAdd) % MOD;
+        afterMul = afterMul * lazyMul[node] % MOD;
+
+        if (left == right) {
+            return (afterMul * values[index] + afterAdd) % MOD;
+        }
+
+        int mid = left + (right - left) / 2;
+
+        if (index <= mid) {
+            return query(node * 2, left, mid, index, afterMul, afterAdd);
+        }
+        return query(node * 2 + 1, mid + 1, right, index, afterMul, afterAdd);
+    }
+
+public:
+    Fancy() {
+        n = 0;
+        lazyMul.assign(4 * MAXN, 1);
+        lazyAdd.assign(4 * MAXN, 0);
+        values.assign(MAXN, 0);
+    }
+
+    void append(int val) {
+        values[n++] = val % MOD;
+    }
+
+    void addAll(int inc) {
+        if (n > 0) {
+            update(1, 0, MAXN - 1, 0, n - 1, 1, inc % MOD);
+        }
+    }
+
+    void multAll(int m) {
+        if (n > 0) {
+            update(1, 0, MAXN - 1, 0, n - 1, m % MOD, 0);
+        }
+    }
+
+    int getIndex(int idx) {
+        if (idx >= n) return -1;
+        return query(1, 0, MAXN - 1, idx);
+    }
+};
