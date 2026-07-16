@@ -1,0 +1,35 @@
+#include <string>
+
+using namespace std;
+
+class Solution {
+public:
+    string getHappyString(int n, int k) {
+        string result;
+
+        // Total happy strings = 3 * 2^(n - 1)
+        int total = 3 * (1 << (n - 1));
+        if (k > total) return "";
+
+        char previous = '#';
+
+        for (int pos = 0; pos < n; ++pos) {
+            // Number of valid strings for every possible current character.
+            int blockSize = 1 << (n - pos - 1);
+
+            for (char ch = 'a'; ch <= 'c'; ++ch) {
+                if (ch == previous) continue;
+
+                if (k > blockSize) {
+                    k -= blockSize;
+                } else {
+                    result += ch;
+                    previous = ch;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+};
