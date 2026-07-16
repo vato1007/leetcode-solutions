@@ -1,0 +1,28 @@
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    int largestSubmatrix(vector<vector<int>>& matrix) {
+        int m = matrix.size();
+        int n = matrix[0].size();
+        vector<int> height(n, 0);
+        int answer = 0;
+
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                height[c] = matrix[r][c] ? height[c] + 1 : 0;
+            }
+
+            vector<int> sorted = height;
+            sort(sorted.begin(), sorted.end(), greater<int>());
+
+            for (int width = 1; width <= n; width++) {
+                answer = max(answer, sorted[width - 1] * width);
+            }
+        }
+
+        return answer;
+    }
+};
