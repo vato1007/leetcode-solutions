@@ -1,0 +1,42 @@
+#include <vector>
+#include <set>
+using namespace std;
+
+class Solution {
+public:
+    vector<int> getBiggestThree(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        set<int, greater<int>> sums;
+
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                sums.insert(grid[r][c]); // area-0 rhombus
+
+                for (int d = 1; r + 2 * d < m && c - d >= 0 && c + d < n; d++) {
+                    int total = grid[r][c] + grid[r + 2 * d][c];
+
+                    // Upper-left and upper-right edges, excluding corners
+                    for (int i = 1; i < d; i++) {
+                        total += grid[r + i][c - i];
+                        total += grid[r + i][c + i];
+                    }
+
+                    // Lower-left and lower-right edges, including left/right corners
+                    for (int i = 0; i < d; i++) {
+                        total += grid[r + d + i][c - d + i];
+                        total += grid[r + d + i][c + d - i];
+                    }
+
+                    sums.insert(total);
+                }
+            }
+        }
+
+        vector<int> answer;
+        for (int sum : sums) {
+            answer.push_back(sum);
+            if (answer.size() == 3) break;
+        }
+        return answer;
+    }
+};
