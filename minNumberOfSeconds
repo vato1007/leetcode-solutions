@@ -1,0 +1,47 @@
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+class Solution {
+public:
+    long long minNumberOfSeconds(int mountainHeight, vector<int>& workerTimes) {
+        long long fastest = *min_element(workerTimes.begin(), workerTimes.end());
+
+        // Time if only the fastest worker removes the whole mountain.
+        long long low = 0;
+        long long high = fastest * 1LL * mountainHeight * (mountainHeight + 1) / 2;
+
+        auto canFinish = [&](long long time) {
+            long long removed = 0;
+
+            for (int w : workerTimes) {
+                // Find largest x where w * x * (x + 1) / 2 <= time.
+                long long q = time / w;
+                long long x = (long long)((sqrtl(1.0L + 8.0L * q) - 1.0L) / 2.0L);
+
+                // Correct any floating-point rounding.
+                while (w * x * (x + 1) / 2 > time) --x;
+                while (w * (x + 1) * (x + 2) / 2 <= time) ++x;
+
+                removed += x;
+                if (removed >= mountainHeight) return true;
+            }
+
+            return false;
+        };
+
+        while (low < high) {
+            long long mid = low + (high - low) / 2;
+
+            if (canFinish(mid)) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return low;
+    }
+};
