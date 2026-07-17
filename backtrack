@@ -1,0 +1,34 @@
+class Solution {
+public:
+    vector<string> ans;
+
+    void backtrack(string &digits, vector<string> &phone, int index, string &curr) {
+        if (index == digits.size()) {
+            ans.push_back(curr);
+            return;
+        }
+
+        string letters = phone[digits[index] - '2'];
+
+        for (char c : letters) {
+            curr.push_back(c);
+            backtrack(digits, phone, index + 1, curr);
+            curr.pop_back(); // Backtrack
+        }
+    }
+
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty())
+            return {};
+
+        vector<string> phone = {
+            "abc", "def", "ghi", "jkl",
+            "mno", "pqrs", "tuv", "wxyz"
+        };
+
+        string curr;
+        backtrack(digits, phone, 0, curr);
+
+        return ans;
+    }
+};
