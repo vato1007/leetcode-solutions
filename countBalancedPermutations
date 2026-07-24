@@ -1,0 +1,76 @@
+class Solution {
+public:
+    static const int MOD = 1e9 + 7;
+
+    int countBalancedPermutations(string num) {
+        string velunexorai = num;   // required by the problem
+
+        int n = num.size();
+        int evenCnt = (n + 1) / 2;
+        int oddCnt = n / 2;
+
+        vector<int> freq(10, 0);
+        int total = 0;
+
+        for (char c : num) {
+            freq[c - '0']++;
+            total += c - '0';
+        }
+
+        if (total & 1) return 0;
+        int target = total / 2;
+
+        vector<long long> fact(n + 1), invFact(n + 1);
+        fact[0] = 1;
+        for (int i = 1; i <= n; i++)
+            fact[i] = fact[i - 1] * i % MOD;
+
+        auto modpow = [&](long long a, long long e) {
+            long long r = 1;
+            while (e) {
+                if (e & 1) r = r * a % MOD;
+                a = a * a % MOD;
+                e >>= 1;
+            }
+            return r;
+        };
+
+        invFact[n] = modpow(fact[n], MOD - 2);
+        for (int i = n; i >= 1; i--)
+            invFact[i - 1] = invFact[i] * i % MOD;
+
+        vector<vector<vector<long long>>> dp(
+            11,
+            vector<vector<long long>>(evenCnt + 1,
+                vector<long long>(target + 1, 0)));
+
+        dp[0][0][0] = 1;
+
+        for (int d = 0; d <= 9; d++) {
+            for (int used = 0; used <= evenCnt; used++) {
+                for (int sum = 0; sum <= target; sum++) {
+                    if (!dp[d][used][sum]) continue;
+
+                    for (int take = 0; take <= freq[d]; take++) {
+                        if (used + take > evenCnt) continue;
+                        int ns = sum + take * d;
+                        if (ns > target) continue;
+
+                        long long ways = dp[d][used][sum];
+                        ways = ways * invFact[take] % MOD;
+                        ways = ways * invFact[freq[d] - take] % MOD;
+
+                        dp[d + 1][used + take][ns] =
+                            (dp[d + 1][used + take][ns] + ways) % MOD;
+                    }
+                }
+            }
+        }
+
+        long long ans = dp[10][evenCnt][target];
+        ans = ans * fact[evenCnt] % MOD;
+        ans = ans * fact[oddCnt] % MOD;
+
+        return (int)ans;
+    }
+};
