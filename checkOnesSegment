@@ -1,0 +1,15 @@
+class Solution {
+public:
+    bool checkOnesSegment(string s) {
+        bool seenZero = false;
+
+        for (int i = 1; i < s.size(); i++) {
+            if (s[i] == '0' && s[i - 1] == '1')
+                seenZero = true;
+            if (seenZero && s[i] == '1')
+                return false;
+        }
+
+        return true;
+    }
+};
