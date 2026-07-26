@@ -1,0 +1,33 @@
+class Solution {
+public:
+    string ans = "";
+    int cnt = 0;
+
+    void dfs(string &cur, int n, int k) {
+        if (!ans.empty()) return;
+
+        if (cur.size() == n) {
+            cnt++;
+            if (cnt == k)
+                ans = cur;
+            return;
+        }
+
+        for (char c : {'a', 'b', 'c'}) {
+            if (cur.empty() || cur.back() != c) {
+                cur.push_back(c);
+                dfs(cur, n, k);
+                cur.pop_back();
+            }
+        }
+    }
+
+    string getHappyString(int n, int k) {
+        if (k > 3 * (1 << (n - 1)))
+            return "";
+
+        string cur;
+        dfs(cur, n, k);
+        return ans;
+    }
+};
