@@ -1,0 +1,33 @@
+class Solution {
+public:
+    int pairSum(ListNode* head) {
+        ListNode *slow = head, *fast = head;
+
+        // Find the middle
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        // Reverse the second half
+        ListNode *prev = nullptr;
+        while (slow) {
+            ListNode *next = slow->next;
+            slow->next = prev;
+            prev = slow;
+            slow = next;
+        }
+
+        // Compute maximum twin sum
+        int ans = 0;
+        ListNode *p1 = head, *p2 = prev;
+
+        while (p2) {
+            ans = max(ans, p1->val + p2->val);
+            p1 = p1->next;
+            p2 = p2->next;
+        }
+
+        return ans;
+    }
+};
