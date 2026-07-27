@@ -1,0 +1,35 @@
+class Solution {
+public:
+    bool dfs(string &s, int idx, long long prev) {
+        if (idx == s.size()) return true;
+
+        long long cur = 0;
+
+        for (int i = idx; i < s.size(); i++) {
+            cur = cur * 10 + (s[i] - '0');
+
+            if (cur > prev - 1)
+                break;
+
+            if (cur == prev - 1) {
+                if (dfs(s, i + 1, cur))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool splitString(string s) {
+        long long first = 0;
+
+        for (int i = 0; i < s.size() - 1; i++) {
+            first = first * 10 + (s[i] - '0');
+
+            if (dfs(s, i + 1, first))
+                return true;
+        }
+
+        return false;
+    }
+};
