@@ -1,0 +1,50 @@
+class Solution {
+public:
+    vector<int> closestRoom(vector<vector<int>>& rooms, vector<vector<int>>& queries) {
+        sort(rooms.begin(), rooms.end(),
+             [](const vector<int>& a, const vector<int>& b) {
+                 return a[1] > b[1];
+             });
+
+        vector<tuple<int, int, int>> qs;
+        for (int i = 0; i < queries.size(); i++) {
+            qs.emplace_back(queries[i][1], queries[i][0], i);
+        }
+
+        sort(qs.begin(), qs.end(), greater<>());
+
+        set<int> ids;
+        vector<int> ans(queries.size());
+
+        int j = 0;
+        for (auto &[minSize, preferred, idx] : qs) {
+            while (j < rooms.size() && rooms[j][1] >= minSize) {
+                ids.insert(rooms[j][0]);
+                j++;
+            }
+
+            if (ids.empty()) {
+                ans[idx] = -1;
+                continue;
+            }
+
+            auto it = ids.lower_bound(preferred);
+
+            int best = -1;
+
+            if (it != ids.end())
+                best = *it;
+
+            if (it != ids.begin()) {
+                --it;
+                if (best == -1 ||
+                    abs(*it - preferred) <= abs(best - preferred))
+                    best = *it;
+            }
+
+            ans[idx] = best;
+        }
+
+        return ans;
+    }
+};
