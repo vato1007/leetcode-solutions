@@ -1,0 +1,52 @@
+class Solution {
+public:
+    char processStr(string s, long long k) {
+        int n = s.size();
+        vector<long long> len(n + 1, 0);
+
+        const long long LIM = k + 1;
+
+        // Compute lengths
+        for (int i = 0; i < n; i++) {
+            char c = s[i];
+            long long cur = len[i];
+
+            if (c >= 'a' && c <= 'z') {
+                cur++;
+            } else if (c == '*') {
+                if (cur > 0) cur--;
+            } else if (c == '#') {
+                cur = min(cur * 2, LIM);
+            } else { // %
+                // length unchanged
+            }
+
+            len[i + 1] = cur;
+        }
+
+        if (k >= len[n]) return '.';
+
+        // Work backwards
+        for (int i = n - 1; i >= 0; i--) {
+            char c = s[i];
+
+            if (c >= 'a' && c <= 'z') {
+                if (k == len[i])
+                    return c;
+            } else if (c == '*') {
+                // Before '*', length increased by 1
+                // Existing indices stay unchanged
+            } else if (c == '#') {
+                long long L = len[i];
+                if (k >= L)
+                    k -= L;
+            } else { // %
+                long long L = len[i];
+                if (L > 0)
+                    k = L - 1 - k;
+            }
+        }
+
+        return '.';
+    }
+};
