@@ -1,0 +1,70 @@
+class Solution {
+public:
+    vector<pair<int,int>> pos;
+
+    int distance(int a, int b) {
+        if (a == 26 || b == 26)
+            return 0;
+
+        return abs(pos[a].first - pos[b].first) +
+               abs(pos[a].second - pos[b].second);
+    }
+
+    int minimumDistance(string word) {
+        vector<string> rows = {
+            "ABCDEF",
+            "GHIJKL",
+            "MNOPQR",
+            "STUVWX",
+            "YZ"
+        };
+
+        pos.assign(26, {0, 0});
+
+        for (int i = 0; i < rows.size(); i++) {
+            for (int j = 0; j < rows[i].size(); j++) {
+                pos[rows[i][j] - 'A'] = {i, j};
+            }
+        }
+
+        vector<vector<int>> dp(27, vector<int>(27, 1e9));
+        dp[26][26] = 0;
+
+        for (char ch : word) {
+            int cur = ch - 'A';
+
+            vector<vector<int>> next(27, vector<int>(27, 1e9));
+
+            for (int f1 = 0; f1 <= 26; f1++) {
+                for (int f2 = 0; f2 <= 26; f2++) {
+
+                    if (dp[f1][f2] == 1e9)
+                        continue;
+
+                    // Move finger 1
+                    next[cur][f2] = min(
+                        next[cur][f2],
+                        dp[f1][f2] + distance(f1, cur)
+                    );
+
+                    // Move finger 2
+                    next[f1][cur] = min(
+                        next[f1][cur],
+                        dp[f1][f2] + distance(f2, cur)
+                    );
+                }
+            }
+
+            dp = next;
+        }
+
+        int ans = 1e9;
+
+        for (auto &row : dp) {
+            for (int x : row)
+                ans = min(ans, x);
+        }
+
+        return ans;
+    }
+};
