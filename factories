@@ -1,0 +1,43 @@
+class Solution {
+public:
+    vector<int> robots;
+    vector<vector<int>> factories;
+    vector<vector<long long>> memo;
+
+    long long solve(int i, int j) {
+        if (i == robots.size())
+            return 0;
+
+        if (j == factories.size())
+            return 1e18;
+
+        if (memo[i][j] != -1)
+            return memo[i][j];
+
+        long long ans = solve(i, j + 1);
+
+        long long cost = 0;
+
+        for (int k = 0; k < factories[j][1] && i + k < robots.size(); k++) {
+            cost += abs((long long)robots[i + k] - factories[j][0]);
+            ans = min(ans, cost + solve(i + k + 1, j + 1));
+        }
+
+        return memo[i][j] = ans;
+    }
+
+    long long minimumTotalDistance(vector<int>& robot,
+                                   vector<vector<int>>& factory) {
+
+        sort(robot.begin(), robot.end());
+        sort(factory.begin(), factory.end());
+
+        robots = robot;
+        factories = factory;
+
+        memo.assign(robot.size() + 1,
+                    vector<long long>(factory.size() + 1, -1));
+
+        return solve(0, 0);
+    }
+};
