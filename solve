@@ -1,0 +1,76 @@
+class Solution {
+public:
+    string a, b;
+    vector<vector<vector<int>>> dp;
+
+    bool solve(int i, int j, int len) {
+
+        // Already calculated
+        if (dp[i][j][len] != -1)
+            return dp[i][j][len];
+
+        // Same substring
+        if (a.substr(i, len) == b.substr(j, len))
+            return dp[i][j][len] = true;
+
+        // Check character frequencies.
+        // If they differ, impossible.
+        int cnt[26] = {};
+
+        for (int k = 0; k < len; k++) {
+            cnt[a[i + k] - 'a']++;
+            cnt[b[j + k] - 'a']--;
+        }
+
+        for (int c : cnt) {
+            if (c != 0)
+                return dp[i][j][len] = false;
+        }
+
+        // Try every possible split
+        for (int k = 1; k < len; k++) {
+
+            // No swap:
+            //
+            // a:  [left | right]
+            // b:  [left | right]
+            //
+            if (solve(i, j, k) &&
+                solve(i + k, j + k, len - k)) {
+                return dp[i][j][len] = true;
+            }
+
+            // Swap:
+            //
+            // a:  [left | right]
+            // b:  [right | left]
+            //
+            if (solve(i, j + len - k, k) &&
+                solve(i + k, j, len - k)) {
+                return dp[i][j][len] = true;
+            }
+        }
+
+        return dp[i][j][len] = false;
+    }
+
+    bool isScramble(string s1, string s2) {
+        a = s1;
+        b = s2;
+
+        int n = a.size();
+
+        if (a == b)
+            return true;
+
+        dp.assign(
+            n,
+            vector<vector<int>>(
+                n,
+                vector<int>(n + 1, -1)
+            )
+        );
+
+        return solve(0, 0, n);
+    }
+};
