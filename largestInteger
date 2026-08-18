@@ -1,0 +1,45 @@
+class Solution {
+public:
+    int largestInteger(vector<int>& nums, int k) {
+        int n = nums.size();
+        int windows = n - k + 1;
+
+        unordered_map<int, vector<int>> pos;
+        for (int i = 0; i < n; i++)
+            pos[nums[i]].push_back(i);
+
+        int ans = -1;
+
+        for (auto &[val, indices] : pos) {
+            int total = 0;
+
+            int curL = -1, curR = -1;
+
+            for (int idx : indices) {
+                int L = max(0, idx - k + 1);
+                int R = min(idx, n - k);
+
+                if (L > R) continue;
+
+                if (curL == -1) {
+                    curL = L;
+                    curR = R;
+                } else if (L > curR + 1) {
+                    total += curR - curL + 1;
+                    curL = L;
+                    curR = R;
+                } else {
+                    curR = max(curR, R);
+                }
+            }
+
+            if (curL != -1)
+                total += curR - curL + 1;
+
+            if (total == 1)
+                ans = max(ans, val);
+        }
+
+        return ans;
+    }
+};
